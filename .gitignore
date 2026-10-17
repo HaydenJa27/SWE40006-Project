@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.so
+*.pyc
 
 # C extensions
 .Python
@@ -24,6 +25,7 @@ frontend/build/
 *.env.local
 *.env.*.local
 !*.env.example
+**/.env
 
 # IDE & OS
 .vscode/
@@ -39,3 +41,6 @@ htmlcov/
 # Observability data volumes
 monitoring/grafana/data/
 monitoring/prometheus/data/
+
+# macOS
+.DS_Store
