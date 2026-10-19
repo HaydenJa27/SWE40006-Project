@@ -1,0 +1,18 @@
+groups:
+
+  - name: inventory-alerts
+
+    rules:
+
+      - alert: InventoryBackendDown
+
+        expr: up{job="inventory-backend"} == 0
+
+        for: 1m
+
+        labels:
+          severity: critical
+
+        annotations:
+          summary: "Inventory backend unavailable"
+          description: "Prometheus cannot scrape the inventory backend."
