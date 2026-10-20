@@ -8,12 +8,14 @@ from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.database import engine, Base, get_db
 from app.api.v1.items import router as items_router
+from app.seed import seed_items
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     if os.getenv("TESTING") != "True":
         try:
             Base.metadata.create_all(bind=engine)
+            seed_items()
         except Exception as exc:
             print(f"Database connection warning on startup: {exc}")
     yield
