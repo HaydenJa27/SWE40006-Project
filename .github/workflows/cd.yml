@@ -1,0 +1,28 @@
+name: CD Pipeline
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types: [completed]
+    branches: [ "main" ]
+
+jobs:
+  deploy-production:
+    name: Deploy to Production AWS EC2
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Echo Deployment Placeholder
+        run: |
+          echo "CI pipeline completed successfully."
+          echo "Ready to deploy container stack to AWS EC2 when host credentials are configured."
+
+      - name: Echo Deployment Placeholder
+        run: |
+          echo "CI pipeline completed successfully."
+          echo "Ready to deploy container stack to AWS EC2 when host credentials are configured."

@@ -16,3 +16,37 @@ groups:
         annotations:
           summary: "Inventory backend unavailable"
           description: "Prometheus cannot scrape the inventory backend."
+
+      - alert: InventoryHighErrorRate
+        expr: |
+          (
+            sum(rate(http_requests_total{
+              job="inventory-backend",
+              status="5xx",
+              handler!="/metrics"
+            }[2m]))
+            /
+            sum(rate(http_requests_total{
+              job="inventory-backend",
+              handler!="/metrics"
+            }[2m]))
+          ) > 0.05
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High HTTP 5xx error rate"
+          description: "More than 5% of application requests are returning HTTP 5xx responses."
+
+      - alert: InventoryDatabaseDown
+
+        expr: pg_up{job="postgres-exporter"} == 0
+
+        for: 1m
+
+        labels:
+          severity: critical
+
+        annotations:
+          summary: "Inventory database unavailable"
+          description: "PostgreSQL Exporter cannot connect to PostgreSQL."
