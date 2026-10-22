@@ -8,21 +8,56 @@ on:
     branches: [ "main" ]
 
 jobs:
-  deploy-production:
-    name: Deploy to Production AWS EC2
+  deploy-staging:
+    name: Deploy to Staging Environment
     runs-on: ubuntu-latest
+    environment: Staging
     if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Echo Deployment Placeholder
-        run: |
-          echo "CI pipeline completed successfully."
-          echo "Ready to deploy container stack to AWS EC2 when host credentials are configured."
+      - name: Deploy to Staging via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.STAGING_HOST }}
+          username: ${{ secrets.STAGING_USER }}
+          key: ${{ secrets.STAGING_SSH_KEY }}
+          script: |
+            echo "Connected to Staging server..."
+            cd SWE40006-Project || git clone https://github.com/HaydenJa27/SWE40006-Project.git && cd SWE40006-Project
+            git fetch --all
+            git checkout main
+            git pull origin main
+            docker compose down
+            docker compose up -d --build
+            docker image prune -f
+            echo "Staging deployment completed successfully."
 
-      - name: Echo Deployment Placeholder
-        run: |
-          echo "CI pipeline completed successfully."
-          echo "Ready to deploy container stack to AWS EC2 when host credentials are configured."
+  deploy-production:
+    name: Deploy to Production AWS EC2
+    runs-on: ubuntu-latest
+    environment: Production
+    needs: deploy-staging
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Production EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_USER }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          script: |
+            echo "Connected to Production EC2..."
+            cd SWE40006-Project || git clone https://github.com/HaydenJa27/SWE40006-Project.git && cd SWE40006-Project
+            git fetch --all
+            git checkout main
+            git pull origin main
+            docker compose down
+            docker compose up -d --build
+            docker image prune -f
+            echo "Production deployment completed successfully."
