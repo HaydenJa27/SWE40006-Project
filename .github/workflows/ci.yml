@@ -80,7 +80,7 @@ jobs:
             prom/prometheus:v3.5.0 \
             check rules /etc/prometheus/alerts.yml
 
-            - name: Validate Grafana Configuration
+      - name: Validate Grafana Configuration
         run: |
           python -m pip install pyyaml
 
