@@ -188,6 +188,104 @@ docker exec -it swe40006-db psql -U postgres -d swe40006_db
 
 ---
 
+## Database Demonstration
+
+The application uses PostgreSQL as the persistent database for inventory data. The FastAPI backend communicates with PostgreSQL through SQLAlchemy, while PostgreSQL is responsible for storing the inventory records and enforcing database-level constraints and generated stock status.
+
+### 1. Access the PostgreSQL Database
+
+After starting the Docker stack, the PostgreSQL database can be accessed directly from the running database container.
+
+```bash
+docker exec -it swe40006-db psql -U postgres -d swe40006_db
+```
+
+The following PostgreSQL commands can be used to inspect the database:
+
+```sql
+\dt
+```
+
+This lists the database tables.
+
+```sql
+\d items
+```
+
+This displays the structure of the `items` table, including its columns, primary key and constraints.
+
+### 2. View Inventory Data
+
+```sql
+SELECT id, name, category, quantity, price, status
+FROM items
+ORDER BY id;
+```
+
+This displays the persisted inventory records stored in PostgreSQL.
+
+### 3. Demonstrate Generated Stock Status
+
+`status` is generated from the item's `quantity` rather than being supplied directly by the frontend.
+
+| Quantity | Generated Status |
+|---:|---|
+| `0` | `Out of Stock` |
+| `1–5` | `Low Stock` |
+| `> 5` | `In Stock` |
+
+```sql
+SELECT id, name, quantity, status
+FROM items
+ORDER BY id;
+```
+
+This query can be used to verify that PostgreSQL has generated the stock status for each inventory item.
+
+### 4. Demonstrate API-to-Database Persistence
+
+A new inventory item can be created through the FastAPI API and then verified directly in PostgreSQL.
+
+```json
+{
+  "name": "Database Demo Laptop",
+  "category": "Laptops",
+  "description": "PostgreSQL database demonstration",
+  "price": 1500,
+  "quantity": 3
+}
+```
+
+This can be submitted through the FastAPI Swagger documentation at `http://localhost:8000/docs`.
+
+```sql
+SELECT id, name, category, quantity, price, status
+FROM items
+WHERE name = 'Database Demo Laptop';
+```
+
+The expected result demonstrates that the record created through the API has been persisted in PostgreSQL and that a quantity of `3` results in the generated status `Low Stock`.
+
+### 5. Database Demonstration Flow
+
+```text
+React Frontend
+      ↓
+Nginx
+      ↓
+FastAPI API
+      ↓
+SQLAlchemy
+      ↓
+PostgreSQL
+      ↓
+items table
+```
+
+This demonstrates the complete data flow from the web application to the FastAPI backend, through SQLAlchemy, and into the PostgreSQL inventory database.
+
+---
+
 ## Project Directory Structure
 
 ```text
