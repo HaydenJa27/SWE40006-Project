@@ -27,9 +27,9 @@ export const Sidebar = ({ activeTab = 'Dashboard', onTabChange = () => {} }) => 
             <Laptop className="w-5 h-5" />
           </div>
           <div>
-            <span className="font-bold text-base text-gray-900 tracking-tight block">SWE40007</span>
+            <span className="font-bold text-base text-gray-900 tracking-tight block">SWE40006</span>
             <span className="text-[10px] text-gray-400 font-medium block -mt-1">Lab Equipment Tracker</span>
-          </div>
+          </div> 
         </div>
 
         {/* Navigation */}
